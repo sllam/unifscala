@@ -21,7 +21,7 @@ abstract class Term[A] {
    def mgu(other: Term[A]): Option[Subst] = mgu(other, Map.empty)
    def unify[B](others: UnifCase[A,B]*) : B = {
      for (other <- others) {
-       if(other.isInstanceOf[ImmutableUnifCase[A,B]]) {      
+       if(other.isInstanceOf[MutUnifCase[A,B]]) {      
          if(unifies(other.pat())) { 
            return other.execute()
          }
@@ -35,7 +35,7 @@ abstract class Term[A] {
      
      throw new UnificationException()
    }
-   def unifyS[B](subst: Subst, others:MutableUnifCase[A,B]*) : B = {
+   def unifyS[B](subst: Subst, others:PureUnifCase[A,B]*) : B = {
      for (other <- others) {
        mgu(other.pat(), subst) match {
          case Some(nsubst) => return other.execute(subst) 
@@ -45,11 +45,11 @@ abstract class Term[A] {
      throw new UnificationException()
    }
    def isGround() : Boolean = true
-   def >=>[B](body: => B) : ImmutableUnifCase[A,B] = {
-      new ImmutableUnifCase[A,B](this, body)
+   def >=>[B](body: => B) : MutUnifCase[A,B] = {
+      new MutUnifCase[A,B](this, body)
    }
-   def withMgu[B](body: Subst => B): MutableUnifCase[A,B] = {
-      new MutableUnifCase[A,B](this, body)
+   def withMgu[B](body: Subst => B): PureUnifCase[A,B] = {
+      new PureUnifCase[A,B](this, body)
    }
    def isPat(): Boolean = false
 }
@@ -281,11 +281,11 @@ abstract class UnifCase[A,B](pat: Term[A]) {
   }
 }
 
-class ImmutableUnifCase[A,B](pat: Term[A], body: => B) extends UnifCase[A,B](pat) {
+class MutUnifCase[A,B](pat: Term[A], body: => B) extends UnifCase[A,B](pat) {
   override def execute(subst: Subst): B = body
 }
 
-class MutableUnifCase[A,B](pat: Term[A], body:  Map[LogVar[Any],Term[Any]] => B) extends UnifCase[A,B](pat) {
+class PureUnifCase[A,B](pat: Term[A], body:  Map[LogVar[Any],Term[Any]] => B) extends UnifCase[A,B](pat) {
   override def execute(subst: Subst): B = body(subst)
 }
 
