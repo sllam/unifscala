@@ -1,2 +1,4 @@
 # unifscala
-A Unification Library for Scala
+
+Unify Like You Pattern Match in Scala!
+======================================
