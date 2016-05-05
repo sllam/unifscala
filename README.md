@@ -11,4 +11,4 @@ Programming via Join Patterns with Guards, Propagation and More) from the Qatar 
 
 Current version supports first-order term unification.
 
-Want to find out more? Check out our short paper.
+For more details, please check out our short paper (https://github.com/sllam/unifscala/blob/master/unifscala_shortpaper.pdf)
